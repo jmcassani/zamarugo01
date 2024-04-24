@@ -1,6 +1,8 @@
 import streamlit as st
+import openai
 
-# Importa las bibliotecas de PNL que necesites
+# Configura tu API key de OpenAI
+openai.api_key = "tu_api_key"
 
 def chat_ui():
     st.title("Chatbot de Automoción")
@@ -14,12 +16,22 @@ def chat_ui():
         st.text_area("Respuesta:", value=response, height=200)
 
 def generate_response(user_input):
-    # Aquí es donde procesarías la pregunta del usuario y generarías una respuesta adecuada
-    # Puedes usar modelos de PNL pre-entrenados o reglas heurísticas, dependiendo de tus necesidades
-    # Por ejemplo, podrías tener un diccionario de preguntas y respuestas predefinidas
-    # o utilizar un modelo de PNL para generar respuestas más sofisticadas
-    # Por ahora, simplemente devolvemos una respuesta genérica
-    return "Gracias por tu pregunta. Soy un chatbot de automoción y estoy aquí para ayudarte."
+    # Define el prompt para la consulta al modelo GPT
+    prompt = f"Me gustaría saber más sobre {user_input}. Soy un experto en ventas, mecánica y automoción."
+
+    # Realiza la consulta al modelo GPT-3.5
+    try:
+        completion = openai.Completion.create(
+            engine="text-davinci-003",
+            prompt=prompt,
+            temperature=0.7,
+            max_tokens=150
+        )
+        response = completion.choices[0].text.strip()
+    except Exception as e:
+        response = "Lo siento, no pude encontrar una respuesta en este momento."
+
+    return response
 
 # Ejecuta la interfaz de usuario del chatbot
 if __name__ == "__main__":
