@@ -8,8 +8,6 @@ api_key = os.getenv("OPENAI_API_KEY")
 # Configurar la clave de API
 openai.api_key = api_key
 
-# Configuración de la API de OpenAI
-openai.api_key = sk-proj-9FWmlDJLMjweNyRz8deJT3BlbkFJde76yd3V5BxuGJKdAx6R
 def generate_response(question):
     prompt = "Pregunta: {}\nRespuesta:".format(question)
     response = openai.Completion.create(
