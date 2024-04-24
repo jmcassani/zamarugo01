@@ -1,50 +1,26 @@
 import streamlit as st
 
-def obtener_respuesta(mensaje):
-    mensaje = mensaje.lower().strip()
-    if "motor" in mensaje:
-        return "Los problemas de motor pueden ser variados, ¿podrías especificar si es un ruido, un fallo en el arranque o algún otro síntoma?"
-    elif "precio" in mensaje:
-        return "El precio de los vehículos varía según el modelo, el año y el estado del vehículo. ¿Estás interesado en algún modelo en particular?"
-    elif "llantas" in mensaje:
-        return "Las llantas adecuadas dependen del tipo de vehículo y el uso que le das. Por ejemplo, para conducción todo terreno, las llantas deben tener un mejor agarre."
-    elif "descuento" in mensaje:
-        return "Actualmente tenemos promociones en varios modelos. ¿Te interesa algún modelo en específico para darte más detalles sobre los descuentos disponibles?"
-    else:
-        return "Lo siento, no entendí bien tu pregunta. ¿Puedes dar más detalles o hacer otra pregunta?"
+# Importa las bibliotecas de PNL que necesites
 
-# HTML básico para una interfaz de chat
-chat_html = """
-<div style='border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 20px;'>
-    <!-- Aquí irán los mensajes del chat -->
-    %s
-</div>
-<input type='text' id='message_input' placeholder='Escribe un mensaje...' style='width: 78%; margin-right: 10px;'>
-<button onclick='sendMessage()'>Enviar</button>
-<script>
-function sendMessage() {
-    const input = document.getElementById('message_input');
-    const message = input.value;
-    input.value = '';
-    if (message) {
-        window.parent.postMessage({type: 'streamlit:setComponentValue', args: {data: message}}, '*');
-    }
-}
-</script>
-"""
+def chat_ui():
+    st.title("Chatbot de Automoción")
 
-# Inicializa el estado si no existe
-if 'messages' not in st.session_state:
-    st.session_state.messages = []
+    # Recibe la pregunta del usuario
+    user_input = st.text_input("Hazme una pregunta sobre automoción:")
 
-# Agregar un nuevo mensaje si se recibe uno
-if st.session_state.widget_values and 'default' in st.session_state.widget_values:
-    user_message = st.session_state.widget_values['default']
-    st.session_state.messages.append(f"Tú: {user_message}")
-    # Obtener la respuesta del "experto"
-    bot_response = obtener_respuesta(user_message)
-    st.session_state.messages.append(f"Experto: {bot_response}")
+    if user_input:
+        # Procesa la pregunta del usuario y genera una respuesta
+        response = generate_response(user_input)
+        st.text_area("Respuesta:", value=response, height=200)
 
-# Formatear y mostrar los mensajes en el HTML
-formatted_messages = "<br>".join(st.session_state.messages)
-st.components.v1.html(chat_html % formatted_messages, height=400)
+def generate_response(user_input):
+    # Aquí es donde procesarías la pregunta del usuario y generarías una respuesta adecuada
+    # Puedes usar modelos de PNL pre-entrenados o reglas heurísticas, dependiendo de tus necesidades
+    # Por ejemplo, podrías tener un diccionario de preguntas y respuestas predefinidas
+    # o utilizar un modelo de PNL para generar respuestas más sofisticadas
+    # Por ahora, simplemente devolvemos una respuesta genérica
+    return "Gracias por tu pregunta. Soy un chatbot de automoción y estoy aquí para ayudarte."
+
+# Ejecuta la interfaz de usuario del chatbot
+if __name__ == "__main__":
+    chat_ui()
