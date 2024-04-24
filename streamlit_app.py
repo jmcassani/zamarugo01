@@ -1,42 +1,50 @@
 import streamlit as st
-from streamlit_toyui import chat_ui
-from langchain.chains import ChatChain
-from langchain.schema import UserMessage
-from langchain.skills import OpenAISkill
 
-# Configurando el skill de OpenAI con personalización de modelo
-def expert_mechanics_sales_automotive_prompt(message):
-    return f"""
-    Soy un experto en mecánica, ventas y automoción con más de 20 años de experiencia en la industria.
-    He trabajado con numerosas marcas de automóviles y tengo un profundo conocimiento de los motores,
-    las últimas tecnologías en automóviles y estrategias efectivas de venta de vehículos. ¿Cómo puedo ayudarte hoy?
-    Pregunta: {message}
-    Respuesta:"""
+def obtener_respuesta(mensaje):
+    mensaje = mensaje.lower().strip()
+    if "motor" in mensaje:
+        return "Los problemas de motor pueden ser variados, ¿podrías especificar si es un ruido, un fallo en el arranque o algún otro síntoma?"
+    elif "precio" in mensaje:
+        return "El precio de los vehículos varía según el modelo, el año y el estado del vehículo. ¿Estás interesado en algún modelo en particular?"
+    elif "llantas" in mensaje:
+        return "Las llantas adecuadas dependen del tipo de vehículo y el uso que le das. Por ejemplo, para conducción todo terreno, las llantas deben tener un mejor agarre."
+    elif "descuento" in mensaje:
+        return "Actualmente tenemos promociones en varios modelos. ¿Te interesa algún modelo en específico para darte más detalles sobre los descuentos disponibles?"
+    else:
+        return "Lo siento, no entendí bien tu pregunta. ¿Puedes dar más detalles o hacer otra pregunta?"
 
-openai_skill = OpenAISkill(
-    api_key="sk-proj-9FWmlDJLMjweNyRz8deJT3BlbkFJde76yd3V5BxuGJKdAx6R",
-    prompt_function=expert_mechanics_sales_automotive_prompt
-)
+# HTML básico para una interfaz de chat
+chat_html = """
+<div style='border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; margin-bottom: 20px;'>
+    <!-- Aquí irán los mensajes del chat -->
+    %s
+</div>
+<input type='text' id='message_input' placeholder='Escribe un mensaje...' style='width: 78%; margin-right: 10px;'>
+<button onclick='sendMessage()'>Enviar</button>
+<script>
+function sendMessage() {
+    const input = document.getElementById('message_input');
+    const message = input.value;
+    input.value = '';
+    if (message) {
+        window.parent.postMessage({type: 'streamlit:setComponentValue', args: {data: message}}, '*');
+    }
+}
+</script>
+"""
 
-# Creando la cadena de chat con el skill configurado.
-chat_chain = ChatChain(skills=[openai_skill])
+# Inicializa el estado si no existe
+if 'messages' not in st.session_state:
+    st.session_state.messages = []
 
-# Streamlit App
-def main():
-    st.title("Chatbot Experto en Mecánica, Ventas y Automoción")
+# Agregar un nuevo mensaje si se recibe uno
+if st.session_state.widget_values and 'default' in st.session_state.widget_values:
+    user_message = st.session_state.widget_values['default']
+    st.session_state.messages.append(f"Tú: {user_message}")
+    # Obtener la respuesta del "experto"
+    bot_response = obtener_respuesta(user_message)
+    st.session_state.messages.append(f"Experto: {bot_response}")
 
-    # Usamos la función chat_ui de ToyUI para manejar la interfaz de chat.
-    chat_log = chat_ui("chat", key="chat")
-
-    # Verificar si hay mensajes nuevos y responder
-    if chat_log.new_message:
-        user_message = chat_log.new_message.text
-        # Creamos un UserMessage, necesario para pasar al chat chain.
-        user_message_obj = UserMessage(text=user_message, sender_id="user")
-        # Usamos el chat chain para obtener una respuesta.
-        response = chat_chain.run(user_message_obj)
-        # Agregamos la respuesta al chat
-        chat_log.append_message("Bot", response.text)
-
-if __name__ == "__main__":
-    main()
+# Formatear y mostrar los mensajes en el HTML
+formatted_messages = "<br>".join(st.session_state.messages)
+st.components.v1.html(chat_html % formatted_messages, height=400)
