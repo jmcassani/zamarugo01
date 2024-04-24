@@ -3,11 +3,14 @@ import os
 from langchain import PromptTemplate
 from langchain_openai import OpenAI
 
-# Acceder a la clave de API desde la variable de entorno
-api_key = os.getenv("OPENAI_API_KEY")
+#Input OpenAI API Key
+st.markdown("## Enter Your OpenAI API Key")
 
-# Configurar la clave de API
-openai.api_key = api_key
+def get_openai_api_key():
+    input_text = st.text_input(label="OpenAI API Key ",  placeholder="Ex: sk-2twmA8tfCb8un4...", key="openai_api_key_input", type="password")
+    return input_text
+
+openai_api_key = get_openai_api_key()
 
 def generate_response(question):
     prompt = "Pregunta: {}\nRespuesta:".format(question)
