@@ -2,7 +2,6 @@ import streamlit as st
 
 # Configuración de la API de OpenAI
 openai.api_key = sk-proj-9FWmlDJLMjweNyRz8deJT3BlbkFJde76yd3V5BxuGJKdAx6R
-
 def generate_response(question):
     prompt = "Pregunta: {}\nRespuesta:".format(question)
     response = openai.Completion.create(
