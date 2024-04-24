@@ -1,6 +1,7 @@
 import streamlit as st
 import os
-import openai
+from langchain import PromptTemplate
+from langchain_openai import OpenAI
 
 # Acceder a la clave de API desde la variable de entorno
 api_key = os.getenv("OPENAI_API_KEY")
